@@ -1,6 +1,6 @@
 
 // LIST DEPENDENCIES
-const { src, dest, watch, series } = require('gulp');
+const { src, dest, series } = require('gulp');
 const gulp = require('gulp');
 const sass = require('gulp-sass');
 const prefix = require('gulp-autoprefixer');
@@ -19,7 +19,7 @@ function compilescss(){
      *  en tot slot in de folder dist/css plaatsen
      */ 
     return src('src/scss/*.scss')
-        .pipe(sass())
+        .pipe(sass().on('error',sass.logError))
         .pipe(prefix())
         .pipe(minify())
         .pipe(dest('dist/css'))
@@ -67,7 +67,7 @@ function webpImg(){
 }
 
 // DE WATCH TASK
-function watchTask(){
+function watch(){
     /*  Als er veranderingen in de map komen
      *  zal de bijhorende functie worden uitgevoerd
      */
@@ -76,17 +76,17 @@ function watchTask(){
             baseDir: './'
         }
     });
-    watch('src/scss/*.scss',compilescss());
-    watch('src/js/*.js',jsmin());
-    watch('src/images/*.{jpg,png}',optimizeImg());
-    watch('dist/images/*.{jpg,png}',webpImg());
+    
+    gulp.watch('./src/scss/*.scss',compilescss);
+    gulp.watch('src/js/*.js',jsmin);
+    gulp.watch('src/images/*.{jpg,png}',optimizeImg);
+    gulp.watch('dist/images/*.{jpg,png}',webpImg);
     gulp.watch('./**/*.html').on('change', browserSync.reload); 
-    gulp.watch('./js/**/*js').on('change', browserSync.reload);
+    
 }
 
-
-// DEFAULT GULP
-/*  Als gulp wordt uitgevoerd zullen de functies standaard worden uitgevoerd
- *  en tot slot ook de watch taak
- */
-exports.watchTask = watchTask;
+exports.compilescss = compilescss;
+exports.jsmin = jsmin;
+exports.optimizeImg = optimizeImg;
+exports.webpImg = webpImg;
+exports.watch = watch;
